@@ -28,11 +28,11 @@ public class AddCustomerServlet extends HttpServlet {
         customer.setCellphone(request.getParameter("cellphone"));
         customer.setEmail(request.getParameter("email"));
         customer.setDescription(request.getParameter("description"));
-        int flag = customerService.addCustomer(customer);
+        int flag = customerService.addCustomer(customer);       //调用业务层执行添加
         if (flag != -1) {
             String msg = "新增成功";
             request.setAttribute("msg", msg);
-            request.getRequestDispatcher("msg.jsp").forward(request,response);
+            request.getRequestDispatcher("msg.jsp").forward(request,response);      //成功后转发到msg页面
         }
     }
 
