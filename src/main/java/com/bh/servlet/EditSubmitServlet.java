@@ -14,10 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * servlet--添加一个客户
+ * servlet--更新一个客户信息
  */
-@WebServlet(name = "AddCustomerServlet", urlPatterns = "/addCustomer")
-public class AddCustomerServlet extends HttpServlet {
+@WebServlet(name = "EditSubmitServlet", urlPatterns = "/updateCustomer")
+public class EditSubmitServlet extends HttpServlet {
     @Autowired
     private CustomerService customerService;      //自动注入CustomerService
 
@@ -25,15 +25,17 @@ public class AddCustomerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //添加参数
         Customer customer = new Customer();
+        customer.setCid(request.getParameter("cid"));
         customer.setCname(request.getParameter("cname"));
         customer.setGender(request.getParameter("gender"));
         customer.setBirthday(DateFormat.toSqlDate(request.getParameter("birthday")));
         customer.setCellphone(request.getParameter("cellphone"));
         customer.setEmail(request.getParameter("email"));
         customer.setDescription(request.getParameter("description"));
-        int flag = customerService.addCustomer(customer);       //调用业务层执行添加
+
+        int flag = customerService.updateCustomer(customer);       //调用业务层执行添加
         if (flag != -1) {
-            String msg = "新增成功";
+            String msg = "更新成功";
             request.setAttribute("msg", msg);
             request.getRequestDispatcher("msg.jsp").forward(request,response);      //成功后转发到msg页面
         }

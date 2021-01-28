@@ -2,8 +2,6 @@ package com.bh.servlet;
 
 import com.bh.pojo.Customer;
 import com.bh.service.CustomerService;
-import com.bh.utils.DateFormat;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
@@ -15,10 +13,10 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * servlet--查找所有客户
+ * 多条件组合查询
  */
-@WebServlet(name = "FindAllCustomerServlet", urlPatterns = "/findAll")
-public class FindAllCustomerServlet extends HttpServlet {
+@WebServlet(name = "QueryCustomerServlet", urlPatterns = "/queryCustomer")
+public class QueryCustomerServlet extends HttpServlet {
     @Autowired
     private CustomerService customerService;      //自动注入CustomerService
 
@@ -29,14 +27,18 @@ public class FindAllCustomerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        List<Customer> customerList = customerService.findAll();
-//        request.setAttribute("customerList", customerList);
-//        request.getRequestDispatcher("list.jsp").forward(request,response);      //成功后转发到list页面
+
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<Customer> customerList = customerService.findAll();
+        Customer customer = new Customer();
+        customer.setCname(req.getParameter("cname"));
+        customer.setGender(req.getParameter("gender"));
+        customer.setCellphone(req.getParameter("cellphone"));
+        customer.setEmail(req.getParameter("email"));
+
+        List<Customer> customerList = customerService.seniorQuery(customer);
         req.setAttribute("customerList", customerList);
         req.getRequestDispatcher("list.jsp").forward(req,resp);      //成功后转发到list页面
     }
