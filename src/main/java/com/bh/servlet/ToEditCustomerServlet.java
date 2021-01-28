@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- *
+ * servlet--通过id查询客户
  */
 @WebServlet(name = "ToEditCustomerServlet", urlPatterns = "/edit")
 public class ToEditCustomerServlet extends HttpServlet {

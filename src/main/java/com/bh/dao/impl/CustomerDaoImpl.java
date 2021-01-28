@@ -108,14 +108,14 @@ public class CustomerDaoImpl implements CustomerDao {
     @Override
     public int updateCustomer(Customer customer) {
         String updateSql = "update tb_customer set cname=?,gender=?," +
-                "birthday=?,cellphone=?,email=?,description=? where cid=?";
+                "birthday=?,cellphone=?,email=?,description=? where cid=?";         //SQL
         Object[] params = {customer.getCname(), customer.getGender(), customer.getBirthday(),
-                customer.getCellphone(), customer.getEmail(), customer.getDescription(), customer.getCid()};
+                customer.getCellphone(), customer.getEmail(), customer.getDescription(), customer.getCid()};       //参数
         try {
-            return queryRunner.update(updateSql, params);
+            return queryRunner.update(updateSql, params);       //执行更新并返回受影响的行数
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-            return -1;
+            return -1;      //更新失败则返回-1
         }
     }
 
@@ -127,11 +127,11 @@ public class CustomerDaoImpl implements CustomerDao {
      */
     @Override
     public Customer findById(String cid) {
-        String querySql = "select * from tb_customer where cid=? and enable='0'";
-        Object param = cid;
+        String querySql = "select * from tb_customer where cid=? and enable='0'";       //SQL
+        Object param = cid;         //参数
         try {
-            Customer customer = queryRunner.query(querySql, new BeanHandler<>(Customer.class), param);
-            return customer;
+            Customer customer = queryRunner.query(querySql, new BeanHandler<>(Customer.class), param);       //调用QueryRunner执行查询
+            return customer;        //返回结果对象
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             return null;
