@@ -22,4 +22,7 @@ public interface CustomerService {
     public long getPageSum();       //获取记录总数
 
     public HashMap paginateInfo(int pageIndex);     //分页信息
+
+    public HashMap paginateInfo(Customer customer, int pageIndex);     //高级查询分页信息
+
 }

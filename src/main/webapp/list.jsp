@@ -33,6 +33,7 @@
     int pageCount = (int) pageInfo.get("pageCount");    //分页总数
     int flag = (int) pageInfo.get("flag");        //最大显示的分页数
     int showPage = flag > pageCount ? pageCount : flag;        //当前分页数
+    int type = (int) pageInfo.get("type");      //查询类型 0：查询全部 1：高级查询
 %>
 <h3 align="center">客户列表</h3>
 <table border="1" width="70%" align="center">
@@ -64,47 +65,48 @@
     <table align="center">
         <tr>
             <td>
-                <a href="/paginateCustomer?pageIndex=1">首页</a>
+                <a href="/paginateQuery?type=<%=type%>&pageIndex=1">首页</a>
             </td>
             <td>
                 <c:if test="<%=pageIndex>1%>">
-                    <a href="/paginateCustomer?pageIndex=<%=pageIndex-1%>">上一页</a>
+                    <a href="/paginateQuery?type=<%=type%>&pageIndex=<%=pageIndex-1%>">上一页</a>
                 </c:if>
             </td>
             <c:if test="<%=pageIndex-flag<0%>">
-                <c:forEach begin="1" end="<%=flag%>" var="index">
+                <c:forEach begin="1" end="<%=flag>pageCount?pageCount:flag%>" var="index">
                     <td>
-                        <form action="/paginateCustomer" method="post">
+                        <form action="/paginateQuery?type=<%=type%>" method="post">
                             <input type="submit" name="pageIndex" value="${index}">
                         </form>
                     </td>
                 </c:forEach>
             </c:if>
 
-            <c:if test="<%=pageCount-pageIndex<flag%>">
-                <c:forEach begin="<%=pageCount-flag+1%>" end="<%=pageCount%>" var="index">
-                    <td>
-                        <form action="/paginateCustomer" method="post">
-                            <input type="submit" name="pageIndex" value="${index}">
-                        </form>
-                    </td>
-                </c:forEach>
-            </c:if>
+            <c:if test="<%=pageCount>flag%>">
+                <c:if test="<%=pageCount-pageIndex<flag%>">
+                    <c:forEach begin="<%=pageCount-flag+1%>" end="<%=pageCount%>" var="index">
+                        <td>
+                            <form action="/paginateQuery?type=<%=type%>" method="post">
+                                <input type="submit" name="pageIndex" value="${index}">
+                            </form>
+                        </td>
+                    </c:forEach>
+                </c:if>
 
-            <c:if test="<%=pageIndex-flag>=0&&pageCount-pageIndex>=flag%>">
-                <c:forEach begin="<%=pageIndex-flag/2>1?pageIndex-flag/2:1%>"
-                           end="<%=pageIndex+flag/2<pageCount?pageIndex+flag/2:pageCount%>" var="index">
-                    <td>
-                        <form action="/paginateCustomer" method="post">
-                            <input type="submit" name="pageIndex" value="${index}">
-                        </form>
-                    </td>
-                </c:forEach>
+                <c:if test="<%=pageIndex-flag>=0&&pageCount-pageIndex>=flag%>">
+                    <c:forEach begin="<%=pageIndex-flag/2>1?pageIndex-flag/2:1%>"
+                               end="<%=pageIndex+flag/2<pageCount?pageIndex+flag/2:pageCount%>" var="index">
+                        <td>
+                            <form action="/paginateQuery?type=<%=type%>" method="post">
+                                <input type="submit" name="pageIndex" value="${index}">
+                            </form>
+                        </td>
+                    </c:forEach>
+                </c:if>
             </c:if>
-
             <td>
                 <c:if test="<%=pageIndex<pageCount%>">
-                    <a href="/paginateCustomer?pageIndex=<%=pageIndex+1%>">下一页</a>
+                    <a href="/paginateQuery?type=<%=type%>&pageIndex=<%=pageIndex+1%>">下一页</a>
                 </c:if>
             </td>
             <td>

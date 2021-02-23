@@ -55,12 +55,19 @@ public class CustomerDaoImpl implements CustomerDao {
         }
     }
 
+    /**
+     * 分页查询全部用户
+     *
+     * @param index
+     * @param perPage
+     * @return
+     */
     @Override
     public List<Customer> paginateCustomer(int index, int perPage) {
-        String querySql="select * from tb_customer limit ?,?";
-        Object[] params= {index,perPage};
+        String querySql = "select * from tb_customer where enable='0' limit ?,?";
+        Object[] params = {index, perPage};
         try {
-            List<Customer> customerList = queryRunner.query(querySql, new BeanListHandler<>(Customer.class),params);
+            List<Customer> customerList = queryRunner.query(querySql, new BeanListHandler<>(Customer.class), params);
             return customerList;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -68,12 +75,64 @@ public class CustomerDaoImpl implements CustomerDao {
         }
     }
 
+    /**
+     * 获取记录总数
+     *
+     * @return
+     */
     @Override
     public long getPageSum() {
-        String querySql="select count(*) as pageCount from tb_customer";
+        String querySql = "select count(*) as pageCount from tb_customer where enable='0'";
         try {
-            Long queryList = queryRunner.query(querySql, new ScalarHandler<>());
-            return queryList;
+            Long pageSum = queryRunner.query(querySql, new ScalarHandler<>());
+            return pageSum;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return -1L;
+        }
+    }
+
+    /**
+     * 获取记录总数（带参）
+     *
+     * @param customer
+     * @return
+     */
+    @Override
+    public long getPageSum(Customer customer) {
+        String querySql = "select count(*) as pageCount from tb_customer where enable='0' ";       //需拼接的SQL
+        Object[] params = new Object[4];
+        int paramCount = 0;     //判断非空的参数个数
+        if (!customer.getCname().trim().equals("")) {
+            querySql += "and cname like concat('%',?,'%') ";       //模糊查询
+            params[paramCount++] = customer.getCname();
+        }
+        if (!customer.getGender().equals("")) {
+            querySql += "and gender = ? ";
+            params[paramCount++] = customer.getGender();
+        }
+        if (!customer.getCellphone().equals("")) {
+            querySql += "and cellphone = ? ";
+            params[paramCount++] = customer.getCellphone();
+        }
+
+        if (!customer.getEmail().equals("")) {
+            querySql += "and email = ? ";
+            params[paramCount++] = customer.getEmail();
+        }
+        Object[] param = new Object[paramCount];      //添加非空的参数到新数组对象
+        for (int i = 0; i < paramCount; i++) {
+            param[i] = params[i];
+        }
+        try {
+            Long pageSum  = null;          //查询结果保存在list集合中
+            if (paramCount > 0) {
+                pageSum = queryRunner.query(querySql, new ScalarHandler<>(),param);
+
+            } else {
+                pageSum = queryRunner.query(querySql, new ScalarHandler<>());        //没有参数则不传param
+            }
+            return pageSum;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             return -1L;
@@ -108,17 +167,69 @@ public class CustomerDaoImpl implements CustomerDao {
             querySql += "and email = ? ";
             params[paramCount++] = customer.getEmail();
         }
-        Object[] param=new Object[paramCount];      //添加非空的参数到新数组对象
-        for (int i=0;i<paramCount;i++){
-            param[i]=params[i];
+        Object[] param = new Object[paramCount];      //添加非空的参数到新数组对象
+        for (int i = 0; i < paramCount; i++) {
+            param[i] = params[i];
         }
         try {
-            List<Customer> customers=null;          //查询结果保存在list集合中
-            if (paramCount>0){
+            List<Customer> customers = null;          //查询结果保存在list集合中
+            if (paramCount > 0) {
                 customers = queryRunner.query(querySql, new BeanListHandler<>(Customer.class), param);
-            }else{
+            } else {
                 customers = queryRunner.query(querySql, new BeanListHandler<>(Customer.class));        //没有参数则不传param
             }
+            return customers;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 高级分页查询
+     *
+     * @param customer
+     * @return
+     */
+    @Override
+    public List<Customer> seniorQueryPaginate(Customer customer, int index, int perPage) {
+        String querySql = "select * from tb_customer where enable='0' ";       //需拼接的SQL
+        Object[] params = new Object[4];
+        int paramCount = 0;     //判断非空的参数个数
+        if (!customer.getCname().trim().equals("")) {
+            querySql += "and cname like concat('%',?,'%') ";       //模糊查询
+            params[paramCount++] = customer.getCname();
+        }
+        if (!customer.getGender().equals("")) {
+            querySql += "and gender = ? ";
+            params[paramCount++] = customer.getGender();
+        }
+        if (!customer.getCellphone().equals("")) {
+            querySql += "and cellphone = ? ";
+            params[paramCount++] = customer.getCellphone();
+        }
+
+        if (!customer.getEmail().equals("")) {
+            querySql += "and email = ? ";
+            params[paramCount++] = customer.getEmail();
+        }
+
+        querySql += " limit ?,?";         //需要查询的页码和记录数
+
+        Object[] param = new Object[paramCount + 2];      //添加非空的参数到新数组对象
+
+        //最后将页码和要查询的记录数条件写入
+        int flag = 0;
+        for (int i = 0; i < paramCount; i++) {
+            param[i] = params[i];
+            flag = i + 1;
+        }
+        param[flag] = index;
+        param[++flag] = perPage;
+        try {
+            List<Customer> customers = null;          //查询结果保存在list集合中
+            customers = queryRunner.query(querySql, new BeanListHandler<>(Customer.class), param);
+
             return customers;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -175,7 +286,7 @@ public class CustomerDaoImpl implements CustomerDao {
     public int addCustomer(Customer customer) {
         String insertSql = "insert into tb_customer values(?,?,?,?,?,?,?,?)";       //需执行的SQL语句
         Object[] params = {GetUUID.getUUID32(), customer.getCname(), customer.getGender(),
-                customer.getBirthday(), customer.getCellphone(), customer.getEmail(), customer.getDescription(),"0"};      //拼装所需参数
+                customer.getBirthday(), customer.getCellphone(), customer.getEmail(), customer.getDescription(), "0"};      //拼装所需参数
         try {
             return queryRunner.update(insertSql, params);        //执行SQL
         } catch (SQLException throwables) {

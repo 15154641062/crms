@@ -21,5 +21,9 @@ public interface CustomerDao {
 
     public long getPageSum();       //获取记录总数
 
+    public long getPageSum(Customer customer);       //获取记录总数（带参）
+
     public List<Customer> paginateCustomer(int index,int perPage);       //分页查询客户
+
+    public List<Customer> seniorQueryPaginate(Customer customer,int index, int perPage);     //高级分页查询
 }
