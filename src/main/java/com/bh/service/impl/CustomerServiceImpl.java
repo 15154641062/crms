@@ -6,6 +6,7 @@ import com.bh.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -40,6 +41,41 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<Customer> findAll() {
         return customerDao.findAll();
+    }
+
+    @Override
+    public long getPageSum() {
+        return 0;
+    }
+
+    /**
+     * 分页查询信息
+     * @param pageIndex
+     * @return
+     */
+    @Override
+    public HashMap paginateInfo(int pageIndex) {
+        int perPage=10;	//每页显示多少数据
+        int pageSum= (int) customerDao.getPageSum();	//记录总数
+        int pageCount;      //分页总数
+        int flag=5;		//显示的分页数
+        int index=(pageIndex-1)*perPage;
+        if (pageSum%perPage==0){
+            pageCount=pageSum/perPage;
+        }else {
+            pageCount=pageSum/perPage+1;
+        }
+        List<Customer> customerList=customerDao.paginateCustomer(index,perPage);
+
+        HashMap pageInfo=new HashMap();
+        pageInfo.put("perPage",perPage);
+        pageInfo.put("pageSum",pageSum);
+        pageInfo.put("pageCount",pageCount);
+        pageInfo.put("flag",flag);
+        pageInfo.put("pageIndex",pageIndex);
+        pageInfo.put("customerList",customerList);
+
+        return pageInfo;
     }
 
     /**

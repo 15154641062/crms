@@ -5,13 +5,15 @@ import com.bh.pojo.Customer;
 import com.bh.utils.GetQueryRunnerByC3p0;
 import com.bh.utils.GetUUID;
 import com.sun.corba.se.spi.ior.ObjectKey;
+import lombok.val;
 import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.handlers.BeanHandler;
-import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.apache.commons.dbutils.handlers.*;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Repository
@@ -50,6 +52,31 @@ public class CustomerDaoImpl implements CustomerDao {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             return -1;
+        }
+    }
+
+    @Override
+    public List<Customer> paginateCustomer(int index, int perPage) {
+        String querySql="select * from tb_customer limit ?,?";
+        Object[] params= {index,perPage};
+        try {
+            List<Customer> customerList = queryRunner.query(querySql, new BeanListHandler<>(Customer.class),params);
+            return customerList;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public long getPageSum() {
+        String querySql="select count(*) as pageCount from tb_customer";
+        try {
+            Long queryList = queryRunner.query(querySql, new ScalarHandler<>());
+            return queryList;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return -1L;
         }
     }
 
@@ -146,9 +173,9 @@ public class CustomerDaoImpl implements CustomerDao {
      */
     @Override
     public int addCustomer(Customer customer) {
-        String insertSql = "insert into tb_customer values(?,?,?,?,?,?,?)";       //需执行的SQL语句
+        String insertSql = "insert into tb_customer values(?,?,?,?,?,?,?,?)";       //需执行的SQL语句
         Object[] params = {GetUUID.getUUID32(), customer.getCname(), customer.getGender(),
-                customer.getBirthday(), customer.getCellphone(), customer.getEmail(), customer.getDescription()};      //拼装所需参数
+                customer.getBirthday(), customer.getCellphone(), customer.getEmail(), customer.getDescription(),"0"};      //拼装所需参数
         try {
             return queryRunner.update(insertSql, params);        //执行SQL
         } catch (SQLException throwables) {

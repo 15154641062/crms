@@ -18,4 +18,8 @@ public interface CustomerDao {
     public int deleteById(String cid);      //通过id删除客户
 
     public List<Customer> seniorQuery(Customer customer);       //多条件组合查询
+
+    public long getPageSum();       //获取记录总数
+
+    public List<Customer> paginateCustomer(int index,int perPage);       //分页查询客户
 }
